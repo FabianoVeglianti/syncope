@@ -2349,6 +2349,7 @@ under the License.
           <artifactId>cargo-maven2-plugin</artifactId>
           <version>1.8.4</version>
           <configuration>
+            <skip>true</skip>     <!-- Aggiunto da me-->
             <configuration>
               <type>standalone</type>
               <properties>
@@ -2380,6 +2381,7 @@ under the License.
             <redirectTestOutputToFile>true</redirectTestOutputToFile>
             <encoding>utf-8</encoding>
             <runOrder>alphabetical</runOrder>
+            <skipITs>true</skipITs>       <!-- Aggiunto da me-->
           </configuration>
           <executions>
             <execution>
