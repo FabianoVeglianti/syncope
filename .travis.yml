@@ -1,31 +1,24 @@
-# Licensed to the Apache Software Foundation (ASF) under one or more
-# contributor license agreements.  See the NOTICE file distributed with
-# this work for additional information regarding copyright ownership.
-# The ASF licenses this file to You under the Apache License, Version 2.0
-# (the "License"); you may not use this file except in compliance with
-# the License.  You may obtain a copy of the License at
-#
-#     http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-
 language: java
 os: linux
 dist: bionic
 arch: amd64
 jdk:
   - openjdk11
+
 cache:
   bundler: false
   cargo: false
   directories:
     - '$HOME/.m2'
+
+addons:
+  sonarcloud:
+    organization: fabianoveglianti
+    token: 70b0ab8fe899f3caf35bbb4557356b3cd70c1a74
+
 git:
   depth: 2
+
 env:
   global:
   - MAVEN_OPTS="-Xmx4096M -Xss128M -XX:+TieredCompilation -XX:TieredStopAtLevel=1 -noverify"
@@ -34,86 +27,12 @@ env:
   - TestCommand="mvn -U -T 1C clean test -Dinvoker.streamLogs=true -Dmodernizer.skip=true -Dianal.skip=true -Drat.skip=true -Dcheckstyle.skip=true -Dsass.skip=true"
 before_install:
 - wget https://github.com/sormuras/bach/raw/master/install-jdk.sh -O ~/install-jdk.sh && chmod +x ~/install-jdk.sh
-install: true
-notifications:
-  email:
-    - dev@syncope.apache.org
-stages:
-  - build
-  - validate
-  - test
-  - fit
-jobs:
-  include:
-    - stage: build
-      name: "Build"
-      script: mvn -U --quiet -T 1C -P skipTests,all
-      #######################################################
-    - stage: validate
-      name: "Checkstyle, Legal Files, Modernizer and Release Audit Tool (RAT) Analysis"
-      script: mvn -T 1C checkstyle:check ianal:verify-legal-files modernizer:modernizer apache-rat:check
-      ######################################################
-    - stage: test
-      name: "Unit Tests via JDK 11"
-      script: eval $TestCommand
-    - stage: test
-      name: "Unit Tests via JDK 14"
-      script: 
-      - ~/install-jdk.sh --target "/home/travis/openjdk14" --workspace "/home/travis/.cache/install-jdk" --feature "14" --license "GPLv2+CE" --cacerts
-      - export JAVA_HOME=~/openjdk14
-      - export PATH="$JAVA_HOME/bin:$PATH"
-      - eval $TestCommand
-    - stage: test
-      name: "Unit Tests via JDK 16"
-      script:
-      - ~/install-jdk.sh --target "/home/travis/openjdk16" --workspace "/home/travis/.cache/install-jdk" --feature "16" --license "GPLv2+CE" --cacerts
-      - export JAVA_HOME=~/openjdk16
-      - export PATH="$JAVA_HOME/bin:$PATH"
-      - eval $TestCommand
-    - stage: test
-      name: "Persistence Unit Tests via JDK 11: PostgreSQL (JSONB)"
-      script: mvn -f core/persistence-jpa-json/pom.xml -P postgres -Dinvoker.streamLogs=true -Dmodernizer.skip=true -Dianal.skip=true -Drat.skip=true -Dcheckstyle.skip=true -Dsass.skip=true
-    - stage: test
-      name: "Persistence Unit Tests via JDK 11: MySQL (JSON)"
-      script: mvn -f core/persistence-jpa-json/pom.xml -P mysql -Dinvoker.streamLogs=true -Dmodernizer.skip=true -Dianal.skip=true -Drat.skip=true -Dcheckstyle.skip=true -Dsass.skip=true
-      ######################################################
-    - stage: fit
-      name: "Integration Tests: Tomcat / H2 / JSON Content-Type"
-      script: mvn -f fit/core-reference/pom.xml verify -Dinvoker.streamLogs=true -Dmodernizer.skip=true -Dianal.skip=true -Drat.skip=true -Dcheckstyle.skip=true -Djacoco.skip=true
-    - stage: fit
-      name: "Integration Tests: Tomcat / H2 / XML Content-Type"
-      script: mvn -f fit/core-reference/pom.xml verify -Djaxrs.content.type=application/xml -Dit.test=org.apache.syncope.fit.core.*ITCase -Dinvoker.streamLogs=true -Dmodernizer.skip=true -Dianal.skip=true -Drat.skip=true -Dcheckstyle.skip=true -Djacoco.skip=true
-    - stage: fit
-      name: "Integration Tests: Tomcat / H2 / YAML Content-Type"
-      script: mvn -f fit/core-reference/pom.xml verify -Djaxrs.content.type=application/yaml -Dit.test=org.apache.syncope.fit.core.*ITCase -Dinvoker.streamLogs=true -Dmodernizer.skip=true -Dianal.skip=true -Drat.skip=true -Dcheckstyle.skip=true -Djacoco.skip=true
-    - stage: fit
-      name: "Integration Tests: Wildfly / H2 / JSON Content-Type"
-      script: mvn -f fit/core-reference/pom.xml -P wildfly-it -Dinvoker.streamLogs=true -Dmodernizer.skip=true -Dianal.skip=true -Drat.skip=true -Dcheckstyle.skip=true -Djacoco.skip=true
-    - stage: fit
-      name: "Integration Tests: Payara / H2 / JSON Content-Type"
-      script: mvn -f fit/core-reference/pom.xml -P payara-it -Dinvoker.streamLogs=true -Dmodernizer.skip=true -Dianal.skip=true -Drat.skip=true -Dcheckstyle.skip=true -Djacoco.skip=true
-    - stage: fit
-      name: "Integration Tests: Tomcat / PostgreSQL / JSON Content-Type"
-      script: mvn -f fit/core-reference/pom.xml -P postgres-it -Dinvoker.streamLogs=true -Dmodernizer.skip=true -Dianal.skip=true -Drat.skip=true -Dcheckstyle.skip=true -Djacoco.skip=true
-    - stage: fit
-      name: "Integration Tests: Tomcat / PostgreSQL (JSONB) / JSON Content-Type"
-      script: mvn -f fit/core-reference/pom.xml -P pgjsonb-it -Dinvoker.streamLogs=true -Dmodernizer.skip=true -Dianal.skip=true -Drat.skip=true -Dcheckstyle.skip=true -Djacoco.skip=true
-    - stage: fit
-      name: "Integration Tests: Tomcat / MySQL / JSON Content-Type"
-      script: mvn -f fit/core-reference/pom.xml -P mysql-it -Dinvoker.streamLogs=true -Dmodernizer.skip=true -Dianal.skip=true -Drat.skip=true -Dcheckstyle.skip=true -Djacoco.skip=true
-    - stage: fit
-      name: "Integration Tests: Tomcat / MySQL (JSON) / JSON Content-Type"
-      script: mvn -f fit/core-reference/pom.xml -P myjson-it -Dinvoker.streamLogs=true -Dmodernizer.skip=true -Dianal.skip=true -Drat.skip=true -Dcheckstyle.skip=true -Djacoco.skip=true
-    - stage: fit
-      name: "Integration Tests: Tomcat / MariaDB / JSON Content-Type"
-      script: mvn -f fit/core-reference/pom.xml -P mariadb-it -Dinvoker.streamLogs=true -Dmodernizer.skip=true -Dianal.skip=true -Drat.skip=true -Dcheckstyle.skip=true -Djacoco.skip=true
-    - stage: fit
-      name: "Integration Tests: Tomcat / H2 / JSON Content-Type + Elasticsearch"
-      script: mvn -f fit/core-reference/pom.xml -P elasticsearch-it -Dinvoker.streamLogs=true -Dmodernizer.skip=true -Dianal.skip=true -Drat.skip=true -Dcheckstyle.skip=true -Djacoco.skip=true
-    - stage: fit
-      name: "Integration Tests: Tomcat / H2 / JSON Content-Type + Zookeeper"
-      script: mvn -f fit/core-reference/pom.xml -P zookeeper-it -Dinvoker.streamLogs=true -Dmodernizer.skip=true -Dianal.skip=true -Drat.skip=true -Dcheckstyle.skip=true -Djacoco.skip=true
-    - stage: fit
-      name: "Integration Tests: SRA and WA"
-      script: mvn -f fit/wa-reference/pom.xml verify -Dinvoker.streamLogs=true -Dmodernizer.skip=true -Dianal.skip=true -Drat.skip=true -Dcheckstyle.skip=true -Djacoco.skip=true "-Dit.test=!*SAML*"
-    #####################################################
+
+script:
+  # the following command line builds the project, runs the tests with coverage and then execute the SonarCloud analysis
+  - mvn -DskipTest -DfailIfNoTests=false clean verify org.jacoco:jacoco-maven-plugin:prepare-agent install sonar:sonar -Dsonar.projectKey=FabianoVeglianti_syncope
+
+
+
+
+
