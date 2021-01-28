@@ -248,7 +248,7 @@ under the License.
     <profile>
       <id>mutation</id>
       <activation>
-        <activeByDefault>true</activeByDefault>
+        <activeByDefault>false</activeByDefault>
       </activation>
       <build>
         <pluginManagement>

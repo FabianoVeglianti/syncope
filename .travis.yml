@@ -30,7 +30,7 @@ before_install:
 install: mvn -U -T 1C -q clean test -Dinvoker.streamLogs=true -Dmodernizer.skip=true -Dianal.skip=true -Drat.skip=true -Dcheckstyle.skip=true -Dsass.skip=true -Dmaven.javadoc.skip=true
 script:
   # the following command line builds the project, runs the tests with coverage and then execute the SonarCloud analysis
-  - mvn "-Dtest=org/apache/syncope/core/spring/myEncryptorTests/*Test" -DfailIfNoTests=false clean verify -e org.jacoco:jacoco-maven-plugin:prepare-agent install sonar:sonar -Dsonar.projectKey=FabianoVeglianti_syncope
+  - mvn -Dtest=MyEncryptorTest,MyRealmValidatorTest  -DfailIfNoTests=false clean verify -e org.jacoco:jacoco-maven-plugin:prepare-agent install sonar:sonar -Dsonar.projectKey=FabianoVeglianti_syncope
 
 
 
