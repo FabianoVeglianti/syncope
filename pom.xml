@@ -2351,7 +2351,7 @@ under the License.
           <artifactId>cargo-maven2-plugin</artifactId>
           <version>1.8.4</version>
           <configuration>
-            <skip>true</skip>     <!-- Aggiunto da me-->
+            <!--      <skip>true</skip>      Aggiunto da me-->
             <configuration>
               <type>standalone</type>
               <properties>
