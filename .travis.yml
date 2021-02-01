@@ -29,7 +29,7 @@ before_install:
 - wget https://github.com/sormuras/bach/raw/master/install-jdk.sh -O ~/install-jdk.sh && chmod +x ~/install-jdk.sh
 script:
   # the following command line builds the project, runs the tests with coverage and then execute the SonarCloud analysis
-  - mvn -Dtest=MyEncryptorTest,MyRealmValidatorTest  -DfailIfNoTests=false clean verify org.jacoco:jacoco-maven-plugin:prepare-agent install sonar:sonar -Dsonar.projectKey=FabianoVeglianti_syncope
+  - mvn -Dtest=MyEncryptorTest,MyRealmValidatorTest -DfailIfNoTests=false clean verify org.jacoco:jacoco-maven-plugin:prepare-agent install sonar:sonar -Dsonar.projectKey=FabianoVeglianti_syncope
 
 
 
