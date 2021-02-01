@@ -27,6 +27,7 @@ env:
   - TestCommand="mvn -U -T 1C clean test -Dinvoker.streamLogs=true -Dmodernizer.skip=true -Dianal.skip=true -Drat.skip=true -Dcheckstyle.skip=true -Dsass.skip=true"
 before_install:
 - wget https://github.com/sormuras/bach/raw/master/install-jdk.sh -O ~/install-jdk.sh && chmod +x ~/install-jdk.sh
+install: mvn install -DSkipTests=true -Dmaven.javadoc.skip=true -B -V -Dmaven.wagon.http.ssl.insecure=true -Dmaven.wagon.http.ssl.allowall=true
 script:
   # the following command line builds the project, runs the tests with coverage and then execute the SonarCloud analysis
   - mvn -Dtest=MyEncryptorTest,MyRealmValidatorTest -DfailIfNoTests=false clean verify org.jacoco:jacoco-maven-plugin:prepare-agent install sonar:sonar -Dsonar.projectKey=FabianoVeglianti_syncope

@@ -143,11 +143,6 @@ under the License.
       <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
       <groupId>org.pitest</groupId>
       <artifactId>pitest-maven</artifactId>
       <version>1.6.2</version>
