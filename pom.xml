@@ -2871,6 +2871,7 @@ under the License.
   <modules>
     <module>common</module>
     <module>core</module>
+    <module>my_tests</module>
     <module>client</module>
     <module>sra</module>
     <module>wa</module>
@@ -2879,7 +2880,6 @@ under the License.
     <module>archetype</module>
     <module>standalone</module>
     <module>ide</module>
-    <module>my_tests</module>
   </modules>
 
 </project>
